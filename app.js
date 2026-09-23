@@ -67,7 +67,8 @@
 
   // Міста ближче за цю відстань зливаються в одну точку (Буча, Ірпінь, Бориспіль → Київ),
   // інакше на глобусі вони лежать одна на одній і в них неможливо поцілити.
-  var MERGE_KM = 40;
+  var MERGE_KM = 60;      // Відень і Братислава (≈55 км) теж зливаємо: інакше точки лежать одна на одній
+  var FAR_KM = 45;        // якщо місто далі за це від «головного», його назва додається в заголовок картки
 
   function distKm(a, b) {
     var rad = Math.PI / 180;
@@ -96,8 +97,9 @@
       if (host) {
         host.people = host.people.concat(c.people);
         host.cities.push(c.city);
+        if (distKm(host, c) > FAR_KM) host.far.push(c.city);
       } else {
-        places.push({ city: c.city, lat: c.lat, lng: c.lng, people: c.people.slice(), cities: [c.city] });
+        places.push({ city: c.city, lat: c.lat, lng: c.lng, people: c.people.slice(), cities: [c.city], far: [] });
       }
     });
     return places;
@@ -225,7 +227,7 @@
     if (!place) return;
     var count = place.people.length;
 
-    cardCity.textContent = place.city;
+    cardCity.textContent = [place.city].concat(place.far || []).join(" · ");
     cardCount.textContent = count + " " + plural(count, "учасник", "учасники", "учасників");
     card.classList.toggle("multi", count > 1);
     cardList.textContent = "";
@@ -313,7 +315,7 @@
         searchIndex.push({
           type: "city", label: city, place: place,
           sub: counts[city] + " " + plural(counts[city], "учасник", "учасники", "учасників") +
-               (city !== place.city ? " · біля міста " + place.city : ""),
+               (city !== place.city ? " · поруч із містом " + place.city : ""),
           keys: cityKeys(city)
         });
       });
