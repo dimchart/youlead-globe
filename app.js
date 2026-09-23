@@ -11,11 +11,22 @@
 
   var card = document.getElementById("card");
   var cardCity = document.getElementById("card-city");
+  var cardCount = document.getElementById("card-count");
   var cardList = document.getElementById("card-list");
   var statsEl = document.getElementById("stats");
 
   var globe = null;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Допоміжне ---------- */
+
+  // Українська множина: 1 учасник, 2 учасники, 5 учасників
+  function plural(n, one, few, many) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+    return many;
+  }
 
   /* ---------- Логін ---------- */
 
@@ -62,57 +73,88 @@
     return Object.keys(map).map(function (k) { return map[k]; });
   }
 
+  /* ---------- Точка на глобусі (велика кнопка) ---------- */
+
+  function makePin(place) {
+    var count = place.people.length;
+
+    var pin = document.createElement("button");
+    pin.type = "button";
+    pin.className = "pin" + (count > 1 ? " multi" : "");
+    pin.setAttribute(
+      "aria-label",
+      place.city + ": " + count + " " + plural(count, "учасник", "учасники", "учасників")
+    );
+
+    var ring = document.createElement("span");
+    ring.className = "ring";
+    var dot = document.createElement("span");
+    dot.className = "dot";
+    var tip = document.createElement("span");
+    tip.className = "tip";
+    tip.textContent = place.city + (count > 1 ? " · " + count : "");
+
+    pin.appendChild(ring);
+    pin.appendChild(dot);
+    pin.appendChild(tip);
+
+    pin.addEventListener("click", function (e) {
+      e.stopPropagation();
+      openCard(place);
+    });
+    return pin;
+  }
+
   /* ---------- Глобус ---------- */
 
   function initGlobe() {
     if (globe) return;
 
-    var places = groupByCity(window.MEMBERS || []);
-    var total = (window.MEMBERS || []).length;
-    statsEl.textContent = total + " учасників · " + places.length + " міст";
+    var members = window.MEMBERS || [];
+    var places = groupByCity(members);
+    statsEl.textContent =
+      members.length + " " + plural(members.length, "учасник", "учасники", "учасників") +
+      " · " +
+      places.length + " " + plural(places.length, "місто", "міста", "міст");
 
     var el = document.getElementById("globe");
 
     globe = Globe()(el)
       .backgroundColor("rgba(0,0,0,0)")
       .showAtmosphere(true)
-      .atmosphereColor("#5b86ff")
-      .atmosphereAltitude(0.16)
+      .atmosphereColor("#9a9a9a")
+      .atmosphereAltitude(0.14)
 
-      // мінімалістична мапа: суша з крапок
+      // мінімалістична мапа: суша з сірих крапок
       .hexPolygonsData(window.COUNTRIES.features)
       .hexPolygonResolution(3)
       .hexPolygonMargin(0.42)
-      .hexPolygonColor(function () { return "rgba(140, 170, 255, 0.55)"; })
+      .hexPolygonColor(function () { return "#8f8f8f"; })
 
-      // точки учасників
-      .pointsData(places)
-      .pointLat("lat")
-      .pointLng("lng")
-      .pointAltitude(0.02)
-      .pointRadius(0.55)
-      .pointColor(function () { return "#7fe3ff"; })
-      .pointLabel(function (d) { return '<div class="tip">' + escapeHtml(d.city) + "</div>"; })
-      .onPointClick(openCard)
-      .onGlobeClick(closeCard)
-
-      // світіння: пульсуючі кільця
-      .ringsData(places)
-      .ringLat("lat")
-      .ringLng("lng")
-      .ringColor(function () {
-        return function (t) { return "rgba(127, 227, 255," + (1 - t) * 0.8 + ")"; };
+      // точки учасників — HTML-кнопки (біла = 1 учасник, помаранчева = кілька)
+      .htmlElementsData(places)
+      .htmlLat("lat")
+      .htmlLng("lng")
+      .htmlAltitude(0.01)
+      .htmlElement(makePin)
+      .htmlElementVisibilityModifier(function (elem, visible) {
+        // ховаємо точки на зворотному боці кулі
+        elem.style.opacity = visible ? "1" : "0";
+        elem.style.pointerEvents = visible ? "auto" : "none";
       })
-      .ringMaxRadius(3.2)
-      .ringPropagationSpeed(1.6)
-      .ringRepeatPeriod(2000);
 
-    // сама куля — темна, майже злита з фоном
+      .onGlobeClick(function (coords, ev) {
+        // клік по самій точці не має закривати картку
+        if (ev && ev.target && ev.target.closest && ev.target.closest(".pin")) return;
+        closeCard();
+      });
+
+    // сама куля — майже чорна, щоб сіра суша добре читалась
     var mat = globe.globeMaterial();
-    mat.color.set("#0b1a45");
-    mat.emissive.set("#08122e");
+    mat.color.set("#141414");
+    mat.emissive.set("#0c0c0c");
     mat.emissiveIntensity = 0.9;
-    mat.shininess = 0.4;
+    mat.shininess = 0.3;
 
     var controls = globe.controls();
     controls.autoRotate = !reduceMotion;
@@ -139,7 +181,11 @@
 
   function openCard(place) {
     if (!place) return;
+    var count = place.people.length;
+
     cardCity.textContent = place.city;
+    cardCount.textContent = count + " " + plural(count, "учасник", "учасники", "учасників");
+    card.classList.toggle("multi", count > 1);
     cardList.textContent = "";
 
     place.people.forEach(function (p) {
@@ -179,12 +225,6 @@
     if (!card.classList.contains("open")) return;
     card.classList.remove("open");
     if (globe && !reduceMotion) globe.controls().autoRotate = true;
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
   }
 
   /* ---------- Старт ---------- */

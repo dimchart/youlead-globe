@@ -1,10 +1,17 @@
 :root {
-  --bg: #060d24;
-  --bg-2: #0b1738;
-  --ink: #e8eeff;
-  --muted: #7d8ab0;
-  --line: rgba(160, 185, 255, 0.22);
-  --accent: #7fe3ff;
+  /* Логін */
+  --navy: #000080;
+  --navy-deep: #00005c;
+  --navy-glow: #0a0aa6;
+
+  /* Головна */
+  --black: #000;
+  --ink: #f4f4f4;
+  --muted: #8d8d8d;
+  --line: rgba(255, 255, 255, 0.2);
+  --orange: #ff8a00;
+  --white: #fff;
+
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -12,12 +19,14 @@
 
 html, body {
   height: 100%;
-  background: radial-gradient(ellipse at 50% 40%, var(--bg-2) 0%, var(--bg) 70%);
+  background: var(--black);
   color: var(--ink);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
+
+button { font: inherit; }
 
 .screen {
   position: fixed;
@@ -26,67 +35,85 @@ html, body {
 }
 .hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-/* ---------- Логін ---------- */
+/* =========================================================
+   ЛОГІН — база #000080
+   ========================================================= */
 #login {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: radial-gradient(ellipse at 50% 40%, var(--navy-glow) 0%, var(--navy) 50%, var(--navy-deep) 100%);
+  color: #fff;
+  z-index: 2;
 }
 
 #login-form {
-  width: min(320px, 82vw);
+  width: min(360px, 86vw);
   text-align: center;
 }
 
 .brand {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 300;
   letter-spacing: 0.55em;
   text-transform: uppercase;
   padding-left: 0.55em; /* компенсує letter-spacing для візуального центру */
-  color: var(--ink);
-  margin-bottom: 44px;
+  margin-bottom: 48px;
 }
 
 .field {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--line);
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   transition: border-color 0.3s;
 }
-.field:focus-within { border-color: var(--accent); }
+.field:focus-within { border-color: #fff; }
 
 .field input {
   flex: 1;
   min-width: 0;
+  height: 56px;
   background: none;
   border: 0;
   outline: 0;
-  color: var(--ink);
+  color: #fff;
   font: inherit;
-  font-size: 15px;
+  font-size: 18px;
   letter-spacing: 0.2em;
-  padding: 12px 0;
+  padding-left: 56px; /* щоб текст був по центру відносно кнопки справа */
   text-align: center;
 }
-.field input::placeholder { color: var(--muted); letter-spacing: 0.15em; }
+.field input::placeholder { color: rgba(255, 255, 255, 0.55); letter-spacing: 0.15em; }
 
+/* велика кнопка входу */
 .field button {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  font-size: 20px;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 22px;
   cursor: pointer;
-  padding: 6px 0 6px 10px;
-  transition: color 0.2s, transform 0.2s;
+  transition: background 0.2s, color 0.2s, transform 0.2s, border-color 0.2s;
 }
-.field button:hover { color: var(--accent); transform: translateX(3px); }
+.field button:hover,
+.field button:focus-visible {
+  background: #fff;
+  color: var(--navy);
+  border-color: #fff;
+  outline: 0;
+  transform: translateX(2px);
+}
 
 .error {
-  height: 18px;
-  margin-top: 14px;
-  font-size: 12px;
-  color: #ff8fa3;
+  height: 20px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #ffb3c1;
   letter-spacing: 0.05em;
   opacity: 0;
   transition: opacity 0.3s;
@@ -108,17 +135,22 @@ html, body {
   font-size: 11px;
   font-weight: 300;
   letter-spacing: 0.14em;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.6);
 }
 .credit a {
-  color: var(--ink);
+  color: #fff;
   text-decoration: none;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 6px 0;
   transition: color 0.2s, border-color 0.2s;
 }
-.credit a:hover { color: var(--accent); border-color: var(--accent); }
+.credit a:hover { border-color: #fff; }
 
-/* ---------- Глобус ---------- */
+/* =========================================================
+   ГОЛОВНА — чорний фон, сірий глобус
+   ========================================================= */
+#app { background: var(--black); }
+
 #globe { position: absolute; inset: 0; cursor: grab; }
 #globe:active { cursor: grabbing; }
 
@@ -143,26 +175,96 @@ html, body {
   color: var(--muted);
 }
 
-.credit-app { pointer-events: none; }
-.credit-app a { pointer-events: auto; }
+.credit-app { pointer-events: none; color: #666; }
+.credit-app a { pointer-events: auto; color: #bbb; border-color: rgba(255, 255, 255, 0.2); }
+.credit-app a:hover { color: #fff; border-color: #fff; }
+
+/* ---------- Точки (кнопки на глобусі) ---------- */
+.pin {
+  --c: var(--white);
+  position: relative;
+  width: 48px;              /* зона натискання 48×48 */
+  height: 48px;
+  margin: 0;                /* globe.gl сам центрує елемент на координатах */
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.25s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pin.multi { --c: var(--orange); }
+
+.pin .dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 10px 2px var(--c);
+  transition: transform 0.2s;
+}
+.pin.multi .dot { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+
+.pin .ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  border: 2px solid var(--c);
+  opacity: 0;
+  animation: pulse 2.2s ease-out infinite;
+  pointer-events: none;
+}
+.pin.multi .ring { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+@keyframes pulse {
+  0%   { transform: scale(1);   opacity: 0.85; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+.pin:hover .dot,
+.pin:focus-visible .dot { transform: scale(1.35); }
+.pin:focus-visible { outline: 2px solid var(--c); outline-offset: -6px; border-radius: 50%; }
+
+/* Підпис міста при наведенні */
+.pin .tip {
+  position: absolute;
+  left: 50%; bottom: 100%;
+  transform: translate(-50%, 2px);
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: rgba(20, 20, 20, 0.92);
+  border: 1px solid var(--line);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.pin:hover .tip,
+.pin:focus-visible .tip { opacity: 1; }
 
 /* ---------- Картка учасників ---------- */
 .card {
   position: absolute;
   top: 50%;
   right: 32px;
-  width: min(320px, calc(100vw - 48px));
-  max-height: 70vh;
+  width: min(340px, calc(100vw - 48px));
+  max-height: 72vh;
   overflow-y: auto;
   transform: translate(24px, -50%);
   opacity: 0;
   visibility: hidden;
-  padding: 26px 24px 20px;
-  background: rgba(10, 20, 52, 0.72);
+  padding: 28px 24px 22px;
+  background: rgba(18, 18, 18, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
 }
 .card.open {
@@ -173,51 +275,72 @@ html, body {
 
 .card-close {
   position: absolute;
-  top: 10px; right: 14px;
-  background: none;
+  top: 6px; right: 6px;
+  width: 44px; height: 44px;
   border: 0;
+  border-radius: 50%;
+  background: transparent;
   color: var(--muted);
-  font-size: 22px;
+  font-size: 26px;
   line-height: 1;
   cursor: pointer;
+  transition: color 0.2s, background 0.2s;
 }
-.card-close:hover { color: var(--ink); }
+.card-close:hover,
+.card-close:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.1); outline: 0; }
 
 .card-city {
-  font-size: 11px;
-  font-weight: 300;
-  letter-spacing: 0.3em;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 18px;
+  color: #fff;
+  padding-right: 40px;
 }
+.card-count {
+  margin: 6px 0 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.card.multi .card-city,
+.card.multi .card-count { color: var(--orange); }
 
 .card-list { list-style: none; }
 .card-list li {
-  padding: 14px 0;
+  padding: 16px 0;
   border-top: 1px solid var(--line);
 }
 .card-list li:first-child { border-top: 0; padding-top: 0; }
 
-.m-name { font-size: 16px; font-weight: 500; }
-.m-role { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.m-name { font-size: 17px; font-weight: 500; }
+.m-role { font-size: 13px; color: var(--muted); margin-top: 3px; }
 
+/* велика кнопка Telegram */
 .m-tg {
-  display: inline-block;
-  margin-top: 10px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--bg);
-  background: var(--accent);
-  padding: 7px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 12px 20px;
   border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  transition: box-shadow 0.25s, transform 0.25s;
+  transition: background 0.2s, box-shadow 0.25s, transform 0.2s;
 }
-.m-tg:hover {
-  box-shadow: 0 0 18px rgba(127, 227, 255, 0.55);
+.card.multi .m-tg { background: var(--orange); }
+.m-tg:hover,
+.m-tg:focus-visible {
+  outline: 0;
   transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
 }
+.card.multi .m-tg:hover,
+.card.multi .m-tg:focus-visible { box-shadow: 0 0 20px rgba(255, 138, 0, 0.55); }
 
 /* ---------- Мобільні ---------- */
 @media (max-width: 640px) {
@@ -227,7 +350,7 @@ html, body {
     bottom: 64px;
     right: 16px; left: 16px;
     width: auto;
-    max-height: 45vh;
+    max-height: 48vh;
     transform: translateY(24px);
   }
   .card.open { transform: translateY(0); }
@@ -235,4 +358,5 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition-duration: 0.01s !important; }
+  .pin .ring { display: none; }
 }
