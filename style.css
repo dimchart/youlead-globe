@@ -183,8 +183,8 @@ button { font: inherit; }
 .pin {
   --c: var(--white);
   position: relative;
-  width: 48px;              /* зона натискання 48×48 */
-  height: 48px;
+  width: 44px;              /* зона натискання */
+  height: 44px;
   margin: 0;                /* globe.gl сам центрує елемент на координатах */
   padding: 0;
   border: 0;
@@ -194,7 +194,7 @@ button { font: inherit; }
   transition: opacity 0.25s;
   -webkit-tap-highlight-color: transparent;
 }
-.pin.multi { --c: var(--orange); }
+.pin.multi { --c: var(--orange); width: 52px; height: 52px; }
 
 .pin .dot {
   position: absolute;
@@ -206,7 +206,7 @@ button { font: inherit; }
   box-shadow: 0 0 10px 2px var(--c);
   transition: transform 0.2s;
 }
-.pin.multi .dot { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+.pin.multi .dot { width: 20px; height: 20px; margin: -10px 0 0 -10px; }
 
 .pin .ring {
   position: absolute;
@@ -219,14 +219,14 @@ button { font: inherit; }
   animation: pulse 2.2s ease-out infinite;
   pointer-events: none;
 }
-.pin.multi .ring { width: 18px; height: 18px; margin: -9px 0 0 -9px; }
+.pin.multi .ring { width: 20px; height: 20px; margin: -10px 0 0 -10px; }
 @keyframes pulse {
   0%   { transform: scale(1);   opacity: 0.85; }
   100% { transform: scale(3.2); opacity: 0; }
 }
 
 .pin:hover .dot,
-.pin:focus-visible .dot { transform: scale(1.35); }
+.pin:focus-visible .dot { transform: scale(1.5); }
 .pin:focus-visible { outline: 2px solid var(--c); outline-offset: -6px; border-radius: 50%; }
 
 /* Підпис міста при наведенні */
@@ -311,6 +311,8 @@ button { font: inherit; }
   border-top: 1px solid var(--line);
 }
 .card-list li:first-child { border-top: 0; padding-top: 0; }
+.card-list li.hl { background: rgba(255, 255, 255, 0.07); margin: 0 -12px; padding-left: 12px; padding-right: 12px; border-radius: 12px; border-top-color: transparent; }
+.card.multi .card-list li.hl { background: rgba(255, 138, 0, 0.14); }
 
 .m-name { font-size: 17px; font-weight: 500; }
 .m-role { font-size: 13px; color: var(--muted); margin-top: 3px; }
@@ -342,9 +344,74 @@ button { font: inherit; }
 .card.multi .m-tg:hover,
 .card.multi .m-tg:focus-visible { box-shadow: 0 0 20px rgba(255, 138, 0, 0.55); }
 
+
+/* ---------- Пошук ---------- */
+.search {
+  position: absolute;
+  top: 16px; left: 50%;
+  transform: translateX(-50%);
+  width: min(340px, calc(100vw - 48px));
+  z-index: 3;
+}
+.search input {
+  width: 100%;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  outline: 0;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.search input::placeholder { color: var(--muted); }
+.search input:focus { border-color: rgba(255, 255, 255, 0.6); }
+.search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.search-results {
+  list-style: none;
+  margin-top: 8px;
+  max-height: 50vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(18, 18, 18, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 6px;
+}
+.search-results[hidden] { display: none; }
+.search-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+.search-item:hover,
+.search-item:focus-visible { background: rgba(255, 255, 255, 0.1); outline: 0; }
+.si-label { font-size: 15px; font-weight: 500; }
+.si-sub { font-size: 12px; color: var(--muted); }
+.search-empty { padding: 14px; font-size: 13px; color: var(--muted); }
+
 /* ---------- Мобільні ---------- */
 @media (max-width: 640px) {
   .hud { top: 20px; left: 20px; right: 20px; }
+  .search { top: 56px; }
   .card {
     top: auto;
     bottom: 64px;

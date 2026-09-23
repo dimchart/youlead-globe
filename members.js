@@ -244,17 +244,17 @@ window.MEMBERS = [
   {
     "name": "Mariia Hryhurko",
     "role": "YouLEAD 2024",
-    "city": "Одеса",
-    "lat": 46.4825,
-    "lng": 30.7233,
+    "city": "Філадельфія",
+    "lat": 39.9526,
+    "lng": -75.1652,
     "telegram": "marifxn"
   },
   {
     "name": "Anastasiia Dabizha",
     "role": "YouLEAD 2024",
-    "city": "Одеса",
-    "lat": 46.4825,
-    "lng": 30.7233,
+    "city": "Нешвілл",
+    "lat": 36.1627,
+    "lng": -86.7816,
     "telegram": "nstsaa_a"
   },
   {
