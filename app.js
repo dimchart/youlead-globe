@@ -146,6 +146,29 @@
 
   /* ---------- Глобус ---------- */
 
+  function buildUkrainePolygon() {
+    var rings = (window.BORDERS && window.BORDERS.ukraine) || [];
+    if (!rings.length) return [];
+    return [{
+      type: "Feature",
+      properties: { name: "Ukraine" },
+      geometry: {
+        type: "MultiPolygon",
+        coordinates: rings.map(function (r) {
+          return [r.map(function (p) { return [p[1], p[0]]; })]; // [lat,lng] -> [lng,lat]
+        })
+      }
+    }];
+  }
+
+  function buildBorderPaths() {
+    var b = window.BORDERS || {};
+    var out = [];
+    (b.other || []).forEach(function (l) { out.push({ pts: l, ukr: false }); });
+    (b.ukraine || []).forEach(function (l) { out.push({ pts: l, ukr: true }); });
+    return out;
+  }
+
   function initGlobe() {
     if (globe) return;
 
@@ -167,6 +190,23 @@
       .hexPolygonResolution(3)
       .hexPolygonMargin(0.42)
       .hexPolygonColor(function () { return "#8f8f8f"; })
+
+      // Україна — світліша заливка по точному контуру
+      .polygonsData(buildUkrainePolygon())
+      .polygonCapColor(function () { return "rgba(255,255,255,0.16)"; })
+      .polygonSideColor(function () { return "rgba(0,0,0,0)"; })
+      .polygonStrokeColor(function () { return "rgba(255,255,255,0.9)"; })
+      .polygonAltitude(0.004)
+
+      // кордони: Україна — яскрава лінія, решта країн Європи — ледь помітні
+      .pathsData(buildBorderPaths())
+      .pathPoints("pts")
+      .pathPointLat(function (p) { return p[0]; })
+      .pathPointLng(function (p) { return p[1]; })
+      .pathPointAlt(0.006)
+      .pathColor(function (d) { return d.ukr ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.28)"; })
+      .pathStroke(function (d) { return d.ukr ? 0.22 : 0.07; })
+      .pathTransitionDuration(0)
 
       // точки учасників — HTML-кнопки (біла = 1 учасник, помаранчева = кілька)
       .htmlElementsData(places)
@@ -260,6 +300,7 @@
     });
 
     card.classList.add("open");
+    appScreen.classList.add("card-open");
     card.scrollTop = 0;
     var hl = cardList.querySelector(".hl");
     if (hl) hl.scrollIntoView({ block: "nearest" });
@@ -270,6 +311,7 @@
   function closeCard() {
     if (!card.classList.contains("open")) return;
     card.classList.remove("open");
+    appScreen.classList.remove("card-open");
     if (globe && !reduceMotion && !userTouched) globe.controls().autoRotate = true;
   }
 
@@ -310,7 +352,7 @@
       place.people.forEach(function (p) { counts[p.city] = (counts[p.city] || 0) + 1; });
       Object.keys(counts).forEach(function (city) {
         searchIndex.push({
-          type: "city", label: city, place: place,
+          type: "city", label: city, place: place, count: counts[city],
           sub: counts[city] + " " + plural(counts[city], "учасник", "учасники", "учасників") +
                (city !== place.city ? " · поруч із містом " + place.city : ""),
           keys: cityKeys(city)
@@ -321,7 +363,12 @@
 
   function runSearch(q) {
     q = norm(q).trim();
-    if (!q) return [];
+    if (!q) {
+      // порожній рядок — показуємо всі міста (за кількістю учасників), щоб не треба було цілитись у точку
+      return searchIndex.filter(function (e) { return e.type === "city"; }).sort(function (a, b) {
+        return b.count - a.count || a.label.localeCompare(b.label, "uk");
+      });
+    }
     var hits = searchIndex.filter(function (e) { return e.keys.indexOf(q) !== -1; });
     hits.sort(function (a, b) {
       var ta = a.type === "city" ? 0 : 1, tb = b.type === "city" ? 0 : 1;
@@ -336,7 +383,6 @@
   function renderSearch() {
     currentHits = runSearch(searchInput.value);
     searchList.textContent = "";
-    if (!searchInput.value.trim()) { searchList.hidden = true; return; }
     if (!currentHits.length) {
       var empty = document.createElement("li");
       empty.className = "search-empty";

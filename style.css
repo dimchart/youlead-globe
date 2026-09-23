@@ -151,7 +151,9 @@ button { font: inherit; }
    ========================================================= */
 #app { background: var(--black); }
 
-#globe { position: absolute; inset: 0; cursor: grab; }
+#globe { position: absolute; inset: 0; cursor: grab; transition: transform 0.6s ease; }
+/* коли відкрита картка, глобус трохи зсувається вліво, щоб вибране місто не ховалось під нею */
+@media (min-width: 641px) { #app.card-open #globe { transform: translateX(-11vw); } }
 #globe:active { cursor: grabbing; }
 
 .hud {
