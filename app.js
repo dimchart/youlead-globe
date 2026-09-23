@@ -13,7 +13,6 @@
   var cardCity = document.getElementById("card-city");
   var cardCount = document.getElementById("card-count");
   var cardList = document.getElementById("card-list");
-  var statsEl = document.getElementById("stats");
 
   var globe = null;
   var userTouched = false;
@@ -152,13 +151,6 @@
 
     var members = window.MEMBERS || [];
     var places = groupByCity(members);
-    var cityCount = {};
-    members.forEach(function (m) { cityCount[m.city] = 1; });
-    var nCities = Object.keys(cityCount).length;
-    statsEl.textContent =
-      members.length + " " + plural(members.length, "учасник", "учасники", "учасників") +
-      " · " +
-      nCities + " " + plural(nCities, "місто", "міста", "міст");
     allPlaces = places;
     buildSearchIndex(places);
 
@@ -282,7 +274,7 @@
   }
 
 
-  /* ---------- Пошук за містом або ім'ям ---------- */
+  /* ---------- Пошук за містом ---------- */
 
   var searchBox = document.getElementById("search");
   var searchInput = document.getElementById("search-input");
@@ -323,9 +315,6 @@
                (city !== place.city ? " · поруч із містом " + place.city : ""),
           keys: cityKeys(city)
         });
-      });
-      place.people.forEach(function (p) {
-        searchIndex.push({ type: "person", label: p.name, sub: p.city, place: place, person: p, keys: norm(p.name) + " " + translit(p.name) });
       });
     });
   }
