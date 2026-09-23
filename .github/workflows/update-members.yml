@@ -1,0 +1,72 @@
+name: Оновити учасників з Excel
+
+on:
+  # Щодня о 00:00 за Варшавою. GitHub рахує cron у UTC, тому два запуски:
+  # 22:00 UTC = 00:00 влітку (CEST), 23:00 UTC = 00:00 взимку (CET).
+  # Крок «Перевірити час» пропускає зайвий запуск, а повторний безпечний (без змін — без коміту).
+  schedule:
+    - cron: "0 22 * * *"
+    - cron: "0 23 * * *"
+  # Кнопка «Run workflow» на GitHub
+  workflow_dispatch:
+  # Одразу після оновлення Excel або самого скрипта
+  push:
+    branches: [main]
+    paths:
+      - data/members.xlsx
+      - scripts/build_members.py
+      - .github/workflows/update-members.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-members
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Перевірити час (тільки для запусків за розкладом)
+        id: gate
+        run: |
+          run=true
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            hour=$(TZ=Europe/Warsaw date +%H)
+            echo "Зараз у Варшаві: ${hour}:xx"
+            if [ "$hour" != "00" ] && [ "$hour" != "01" ]; then
+              run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Встановити openpyxl
+        if: steps.gate.outputs.run == 'true'
+        run: pip install openpyxl
+
+      - name: Перетворити Excel у members.js
+        if: steps.gate.outputs.run == 'true'
+        run: python scripts/build_members.py
+
+      - name: Закомітити зміни (якщо є)
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          git config user.name "youlead-bot"
+          git config user.email "youlead-bot@users.noreply.github.com"
+          git add members.js data/geocache.json
+          if git diff --cached --quiet; then
+            echo "Змін немає."
+          else
+            git commit -m "Оновити учасників з Excel"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
