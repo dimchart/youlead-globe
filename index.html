@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouLead — Globe</title>
+  <meta name="theme-color" content="#060d24">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Екран 1: логін -->
+  <main id="login" class="screen">
+    <form id="login-form" autocomplete="off">
+      <h1 class="brand">YouLead</h1>
+      <div class="field">
+        <input id="password" type="password" placeholder="пароль" aria-label="Пароль" autofocus>
+        <button type="submit" aria-label="Увійти">→</button>
+      </div>
+      <p id="login-error" class="error" aria-live="polite"></p>
+    </form>
+    <footer class="credit">
+      запроєктовано і виготовлено Дмитром
+      <a href="https://t.me/dim4art" target="_blank" rel="noopener">@dim4art</a>
+    </footer>
+  </main>
+
+  <!-- Екран 2: глобус -->
+  <section id="app" class="screen hidden">
+    <div id="globe"></div>
+
+    <header class="hud">
+      <span class="hud-brand">YouLead</span>
+      <span id="stats" class="hud-stats"></span>
+    </header>
+
+    <aside id="card" class="card" aria-live="polite">
+      <button id="card-close" class="card-close" aria-label="Закрити">×</button>
+      <p id="card-city" class="card-city"></p>
+      <ul id="card-list" class="card-list"></ul>
+    </aside>
+
+    <footer class="credit credit-app">
+      запроєктовано і виготовлено Дмитром
+      <a href="https://t.me/dim4art" target="_blank" rel="noopener">@dim4art</a>
+    </footer>
+  </section>
+
+  <script src="config.js"></script>
+  <script src="members.js"></script>
+  <script src="lib/countries.js"></script>
+  <script src="lib/globe.gl.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

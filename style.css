@@ -1,0 +1,238 @@
+:root {
+  --bg: #060d24;
+  --bg-2: #0b1738;
+  --ink: #e8eeff;
+  --muted: #7d8ab0;
+  --line: rgba(160, 185, 255, 0.22);
+  --accent: #7fe3ff;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 40%, var(--bg-2) 0%, var(--bg) 70%);
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
+  transition: opacity 0.9s ease, visibility 0.9s;
+}
+.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ---------- Логін ---------- */
+#login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#login-form {
+  width: min(320px, 82vw);
+  text-align: center;
+}
+
+.brand {
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  padding-left: 0.55em; /* компенсує letter-spacing для візуального центру */
+  color: var(--ink);
+  margin-bottom: 44px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  transition: border-color 0.3s;
+}
+.field:focus-within { border-color: var(--accent); }
+
+.field input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  padding: 12px 0;
+  text-align: center;
+}
+.field input::placeholder { color: var(--muted); letter-spacing: 0.15em; }
+
+.field button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px 0 6px 10px;
+  transition: color 0.2s, transform 0.2s;
+}
+.field button:hover { color: var(--accent); transform: translateX(3px); }
+
+.error {
+  height: 18px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #ff8fa3;
+  letter-spacing: 0.05em;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.error.show { opacity: 1; }
+
+#login-form.shake { animation: shake 0.4s; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-7px); }
+  75% { transform: translateX(7px); }
+}
+
+/* ---------- Підпис ---------- */
+.credit {
+  position: absolute;
+  left: 0; right: 0; bottom: 26px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+.credit a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.2s, border-color 0.2s;
+}
+.credit a:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- Глобус ---------- */
+#globe { position: absolute; inset: 0; cursor: grab; }
+#globe:active { cursor: grabbing; }
+
+.hud {
+  position: absolute;
+  top: 28px; left: 32px; right: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  pointer-events: none;
+}
+.hud-brand {
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+}
+.hud-stats {
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.credit-app { pointer-events: none; }
+.credit-app a { pointer-events: auto; }
+
+/* ---------- Картка учасників ---------- */
+.card {
+  position: absolute;
+  top: 50%;
+  right: 32px;
+  width: min(320px, calc(100vw - 48px));
+  max-height: 70vh;
+  overflow-y: auto;
+  transform: translate(24px, -50%);
+  opacity: 0;
+  visibility: hidden;
+  padding: 26px 24px 20px;
+  background: rgba(10, 20, 52, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+}
+.card.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%);
+}
+
+.card-close {
+  position: absolute;
+  top: 10px; right: 14px;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.card-close:hover { color: var(--ink); }
+
+.card-city {
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+.card-list { list-style: none; }
+.card-list li {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.card-list li:first-child { border-top: 0; padding-top: 0; }
+
+.m-name { font-size: 16px; font-weight: 500; }
+.m-role { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+.m-tg {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--bg);
+  background: var(--accent);
+  padding: 7px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.m-tg:hover {
+  box-shadow: 0 0 18px rgba(127, 227, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+/* ---------- Мобільні ---------- */
+@media (max-width: 640px) {
+  .hud { top: 20px; left: 20px; right: 20px; }
+  .card {
+    top: auto;
+    bottom: 64px;
+    right: 16px; left: 16px;
+    width: auto;
+    max-height: 45vh;
+    transform: translateY(24px);
+  }
+  .card.open { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition-duration: 0.01s !important; }
+}
