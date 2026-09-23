@@ -16,6 +16,7 @@
   var statsEl = document.getElementById("stats");
 
   var globe = null;
+  var userTouched = false;
   var allPlaces = [];
   var searchIndex = [];
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -139,7 +140,7 @@
       if (globe) globe.controls().autoRotate = false;
     });
     pin.addEventListener("mouseleave", function () {
-      if (globe && !reduceMotion && !card.classList.contains("open")) globe.controls().autoRotate = true;
+      if (globe && !reduceMotion && !userTouched && !card.classList.contains("open")) globe.controls().autoRotate = true;
     });
     return pin;
   }
@@ -202,12 +203,16 @@
 
     var controls = globe.controls();
     controls.autoRotate = !reduceMotion;
-    controls.autoRotateSpeed = 0.45;
+    controls.autoRotateSpeed = 0.18;
     controls.enableDamping = true;
-    controls.minDistance = 180;
+    controls.minDistance = 115;
     controls.maxDistance = 520;
 
-    globe.pointOfView({ lat: 40, lng: 20, altitude: 2.0 }, 0);
+    // стартуємо з Європи, наближено — Україна займає більшу частину екрана
+    var narrow = window.innerWidth < 640;
+    globe.pointOfView({ lat: 47.5, lng: 26, altitude: narrow ? 1.5 : 0.95 }, 0);
+    // щойно користувач торкнувся глобуса — обертання зупиняється назавжди
+    controls.addEventListener("start", function () { userTouched = true; controls.autoRotate = false; });
     window.__globe = globe; // для налагодження в консолі браузера
 
     resize();
@@ -267,13 +272,13 @@
     var hl = cardList.querySelector(".hl");
     if (hl) hl.scrollIntoView({ block: "nearest" });
     globe.controls().autoRotate = false;
-    globe.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.15 }, 900);
+    globe.pointOfView({ lat: place.lat, lng: place.lng, altitude: 0.7 }, 900);
   }
 
   function closeCard() {
     if (!card.classList.contains("open")) return;
     card.classList.remove("open");
-    if (globe && !reduceMotion) globe.controls().autoRotate = true;
+    if (globe && !reduceMotion && !userTouched) globe.controls().autoRotate = true;
   }
 
 
