@@ -193,7 +193,7 @@
 
       // Україна — світліша заливка по точному контуру
       .polygonsData(buildUkrainePolygon())
-      .polygonCapColor(function () { return "rgba(255,255,255,0.16)"; })
+      .polygonCapColor(function () { return "rgba(255,255,255,0.2)"; })
       .polygonSideColor(function () { return "rgba(0,0,0,0)"; })
       .polygonStrokeColor(function () { return "rgba(255,255,255,0.9)"; })
       .polygonAltitude(0.004)
